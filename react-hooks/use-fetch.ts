@@ -20,7 +20,19 @@ interface FetchArgument {
     resetStatus?: boolean;
 }
 
-function useFetch<TData>() {
+type MethodCallback = (arg: Omit<FetchArgument, 'method'>) => Promise<void>;
+
+type UseFetchReturnValue<TData> = [
+    UseApiState<TData>,
+    {
+        get: MethodCallback,
+        post: MethodCallback,
+        put: MethodCallback,
+        del: MethodCallback,
+    }
+]
+
+export default function useFetch<TData>(): UseFetchReturnValue<TData> {
     const [state, setState] = useState<UseApiState<TData>>(initialState);
     const requestCounter = useRef(0);
     useEffect(() => () => requestCounter.current++); // when component unmounts, responses are ignored
@@ -63,8 +75,8 @@ function useFetch<TData>() {
         }
     }, [])
     const methods = useMemo(() => {
-        const createFetchMethod = (method: FetchMethod) => {
-            return (arg: Omit<FetchArgument, 'method'>) => startFetch({...arg, method})
+        const createFetchMethod = (method: FetchMethod): MethodCallback => {
+            return (arg) => startFetch({...arg, method})
         }
         return {
             get: createFetchMethod('GET'),
