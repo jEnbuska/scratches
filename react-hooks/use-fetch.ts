@@ -6,17 +6,9 @@ interface UseApiState<TData> {
     error?: string;
     status?: number;
 }
-const initialState = {
-    loading: false,
-    data: undefined,
-    error: undefined
-}
-const defaultHeaders = {
-    "Accept": "application/json",
-    "Content-Type": "application/json",
-};
 
 type FetchMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
 interface FetchArgument {
     url: string;
     body?: any,
@@ -28,13 +20,13 @@ interface FetchArgument {
     resetStatus?: boolean;
 }
 
-function useApi<TData>() {
+function useFetch<TData>() {
     const [state, setState] = useState<UseApiState<TData>>(initialState);
     const requestCounter = useRef(0);
     useEffect(() => () => requestCounter.current++); // when component unmounts, responses are ignored
     const startFetch = useCallback(async (fetchArgument: FetchArgument) => {
         const requestNumber = ++requestCounter.current;
-        const { url, method, setLoading = true, resetData = true, clearError = true, resetStatus = true, headers } = fetchArgument;
+        const { setLoading = true, resetData = true, clearError = true, resetStatus = true, } = fetchArgument;
         setState((prevState) => {
             return {
                 ...prevState,
@@ -44,9 +36,9 @@ function useApi<TData>() {
                 status: resetStatus ? undefined : prevState.status,
             }
         });
-        const body = parseRequestBody(fetchArgument.body);
+        const { url, method, body, headers, } = fetchArgument;
         const response = await api(url, { method, headers: { ...defaultHeaders, ...headers}, body, })
-        if (requestNumber !== requestCounter.current) {
+        if (requestNumber !== requestCounter.current) { // new request started before previous was finished
             return;
         }
         const {status} = response;
@@ -84,15 +76,24 @@ function useApi<TData>() {
     return [state, methods];
 }
 
-export const api = (...args: any[]): any => {
+
+const initialState = {
+    loading: false,
+    data: undefined,
+    error: undefined
+}
+const defaultHeaders = {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+};
+
+// TODO
+const api = (...args: any[]): any => {
     console.warn('api not implemented')
 }
 
-export const parseError = (...args: any[]): any => {
+// TODO
+const parseError = (...args: any[]): any => {
     console.warn('parseError not implemented')
-}
-
-export const parseRequestBody = (body: any): any => {
-    console.warn('parseRequestBody not implemented')
 }
 
