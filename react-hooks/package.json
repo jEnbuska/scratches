@@ -1,0 +1,30 @@
+{
+  "name": "react-hooks",
+  "version": "1.0.0",
+  "description": "just some randon react hooks",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jEnbuska/scratches.git"
+  },
+  "keywords": [
+    "react",
+    "hooks",
+    "react-hooks",
+    "typescipt"
+  ],
+  "author": "Joona Enbuska",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jEnbuska/scratches/issues"
+  },
+  "homepage": "https://github.com/jEnbuska/scratches#readme",
+  "dependencies": {
+    "@types/react": "^16.9.50",
+    "react": "^16.13.1",
+    "typescript": "^4.0.3"
+  }
+}
