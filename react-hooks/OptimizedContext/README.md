@@ -75,6 +75,8 @@ type TodoItemProps = {
 const TodoItem = memo<TodoItemProps>(({id}) => {
     const {todos, changeTodo} = useOptimizedContext(TodoContext, (todos) => [todos.find(todo => todo.id === id)]);
     const todo = todos.find(todo => todo.id);
-    /* ... */
+    /* 
+    ... and so on ... 
+    */
 })
 ```
