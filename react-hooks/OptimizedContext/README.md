@@ -44,7 +44,6 @@ const TodoContextProvider: ComponentType = ({children}) => {
 
 ## 3. Provide OptimizedContext such as any React.Context
 ```
-// index.tsx
 const Root: ComponentType () => {
   return (
     <TodoContextProvider>
@@ -58,8 +57,6 @@ ReactDOM.render(<Root />, document.getElementById('root'));
 
 ## 4. Consume OptimizedContext
 ```
-// TodoList.tsx
-
 const TodoList: ComponentType = (() => {
     const {todos} = useOptimizedContext(TodoContext, (todos) => todos.map(todo => todo.id));
     return todos.map(todo => {
@@ -70,8 +67,6 @@ const TodoList: ComponentType = (() => {
 })
 
 ...
-
-// TodoItem.tsx
 
 type TodoItemProps = {
     id: string;
