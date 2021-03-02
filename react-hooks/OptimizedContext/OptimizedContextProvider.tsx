@@ -9,16 +9,14 @@ import React, {
 } from 'react';
 import useAutoRef from "../useAutoRef";
 
-export type OptimizedContextMeta<Value> = {
-    version: number;
-    value: Value;
-}
-
 export type OptimizedContext<Value> = Context<{
     // function that takes a callback as argument, and returns a callback, that unsubscribes the callback
     subscribe: (callback: () => void) => () => void;
     // function that returns the contexts value and the version of the value (number of times the value has changed)
-    getContextMeta: () => OptimizedContextMeta<Value>;
+    getContextMeta: () => {
+        version: number;
+        value: Value;
+    };
 }>
 
 export type OptimizedContextProviderProps<Value> = {
@@ -54,7 +52,7 @@ export default function OptimizedContextProvider<Value> ({ value, context, child
     }, []);
 
     // Notify all subscribers after value has changed so that they can determine if to rerender
-    const getContextMeta = useCallback((): OptimizedContextMeta<Value> => {
+    const getContextMeta = useCallback(() => {
         return {
             version: contextVersionRef.current,
             value: valueRef.current,
