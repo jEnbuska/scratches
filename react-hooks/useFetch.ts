@@ -7,7 +7,8 @@ interface UseApiState<TData> {
     status?: number;
 }
 
-type FetchMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+type FetchMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE' | 'PATCH';
+const fetchMethods: FetchMethod[] = [ 'GET', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH', ];
 
 interface FetchArgument {
     url: string;
@@ -22,21 +23,32 @@ interface FetchArgument {
 
 type MethodCallback = (arg: Omit<FetchArgument, 'method'>) => Promise<void>;
 
+type FetchMethodCallbacks = {
+    [key in FetchMethod]: MethodCallback;
+}
+
 type UseFetchReturnValue<TData> = [
     UseApiState<TData>,
-    {
-        get: MethodCallback,
-        post: MethodCallback,
-        put: MethodCallback,
-        del: MethodCallback,
-    }
+    FetchMethodCallbacks,
 ]
 
-export default function useFetch<TData>(): UseFetchReturnValue<TData> {
+type StartFetch = (fetchArguments: FetchArgument) => Promise<void>
+
+const initialState = {
+    loading: false,
+    data: undefined,
+    error: undefined
+}
+type UseFetchArgument<TData> = {
+    initialLoading: boolean;
+    initialData?: TData;
+};
+export default function useFetch<TData>(config: UseFetchArgument<TData>): UseFetchReturnValue<TData> {
+
     const [state, setState] = useState<UseApiState<TData>>(initialState);
     const requestCounter = useRef(0);
     useEffect(() => () => requestCounter.current++); // when component unmounts, responses are ignored
-    const startFetch = useCallback(async (fetchArgument: FetchArgument) => {
+    const startFetch: StartFetch = useCallback(async (fetchArgument) => {
         const requestNumber = ++requestCounter.current;
         const { setLoading = true, resetData = true, clearError = true, resetStatus = true, } = fetchArgument;
         setState((prevState) => {
@@ -50,6 +62,7 @@ export default function useFetch<TData>(): UseFetchReturnValue<TData> {
         });
         const { url, method, body, headers, } = fetchArgument;
         const response = await api(url, { method, headers: { ...defaultHeaders, ...headers}, body, })
+
         if (requestNumber !== requestCounter.current) { // new request started before previous was finished
             return;
         }
@@ -78,22 +91,15 @@ export default function useFetch<TData>(): UseFetchReturnValue<TData> {
         const createFetchMethod = (method: FetchMethod): MethodCallback => {
             return (arg) => startFetch({...arg, method})
         }
-        return {
-            get: createFetchMethod('GET'),
-            post: createFetchMethod('POST'),
-            put: createFetchMethod('PUT'),
-            del: createFetchMethod('DELETE'),
-        }
+        const methodMap: Partial<FetchMethodCallbacks> = {};
+        fetchMethods.forEach((method) => {
+            methodMap[method] = createFetchMethod(method);
+        });
+        return methodMap as FetchMethodCallbacks;
     }, []);
     return [state, methods];
 }
 
-
-const initialState = {
-    loading: false,
-    data: undefined,
-    error: undefined
-}
 const defaultHeaders = {
     "Accept": "application/json",
     "Content-Type": "application/json",
@@ -108,4 +114,3 @@ const api = (...args: any[]): any => {
 const parseError = (...args: any[]): any => {
     console.warn('parseError not implemented')
 }
-
