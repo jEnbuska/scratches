@@ -11,7 +11,7 @@ const TodosContext = createOptimizedContext({
     }
 })
 ```
-## 2. Define Context using OptimizedContextProvider
+## 2. Define Context.Provider using OptimizedContextProvider
 ```
 const TodoContextProvider: ComponentType = ({children}) => {
     const [todos, setTodos] = useState<Todo[]>([]);
