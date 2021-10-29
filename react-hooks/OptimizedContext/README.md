@@ -18,13 +18,13 @@ const TodoContextProvider: ComponentType = ({children}) => {
     
     const addTodo = useCallback((todo: Todo) => {
         setTodos((prevState) => [...prevState, todo]);
-    }, []);
+    }, [setTodos]);
     
     const changeTodo = useCallback((changedTodo: Todo) => {
         setTodos((prevState) => {
             return prevState.map(todo => todo.id === changedTodo.id ? changedTodo : todo);
         }}
-    }, [])
+    }, [setTodos])
     
     const contextValue = useMemo(() => {
         return {
