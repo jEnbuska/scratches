@@ -58,7 +58,11 @@ ReactDOM.render(<Root />, document.getElementById('root'));
 ## 4. Consume OptimizedContext
 ```
 const TodoList: ComponentType = (() => {
-    const {todos} = useOptimizedContext(TodoContext, (todos) => todos.map(todo => todo.id));
+    const {todos} = useOptimizedContext(
+         TodoContext, 
+         (ctx) => ctx.todos.map(todo => todo.id) 
+         // returning todo ids, update component on context change only when todos are re-ordered, added or removed
+    );
     return todos.map(todo => {
         return (
             <TodoItem key={todo.id} id={todo.id} />
@@ -73,7 +77,12 @@ type TodoItemProps = {
 };
 
 const TodoItem = memo<TodoItemProps>(({id}) => {
-    const {todos, changeTodo} = useOptimizedContext(TodoContext, (todos) => [todos.find(todo => todo.id === id)]);
+    const {todos, changeTodo} = useOptimizedContext(TodoContext, 
+       (ctx) => [
+           ctx.todos.find(todo => todo.id === id),
+           ctx.changeTodo
+       ]   // returning todo and changeTodo callback, will cause the component to udpate only when these values change
+    );
     const todo = todos.find(todo => todo.id);
     /* 
     ... and so on ... 
